@@ -70,6 +70,11 @@ class UsersModel:
         row = cursor.fetchone()
         return (True, row[0]) if row else (False,)
 
+    def get_id(self, user_name):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM users WHERE user_name = ?", (str(user_name),))
+        row = cursor.fetchone()
+        return row[0]
 
 UsersModel(db.get_connection()).init_table()
 
@@ -229,6 +234,14 @@ def users():
         usernews = len(NewsModel(db.get_connection()).get_all(i[0]))
         usersn.append(((i[1]), usernews))
     return render_template('/users.html', users=usersn)
+
+
+@app.route('/user/<username>', methods=['GET', 'POST'])
+def user(username):
+    userid = UsersModel(db.get_connection()).get_id(username)
+    usernews = NewsModel(db.get_connection()).get_all(userid)
+    return render_template('user.html', username=username, news=usernews)
+
 
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')

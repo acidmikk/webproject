@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Страница {{username}}</h1>
+        {% for item in news %}
+            <div class="alert alert-dark" role="alert">
+                <h2>{{item[1]}}</h2>
+                <div>{{item[2]}}</div>
+                <div class="d-flex justify-content-between">
+                    <a href="/delete_news/{{item[0]}}">Удалить новость</a>
+                    <a>{{item[4]}}</a>
+                </div>
+            </div>
+        {% endfor %}
+{% endblock %}

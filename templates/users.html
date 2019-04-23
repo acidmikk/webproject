@@ -12,7 +12,7 @@
             <tbody>
                 {% for user in users %}
                 <tr>
-                    <td>{{user[0]}}</td>
+                    <td><a href="/user/{{user[0]}}"> {{user[0]}}</a></td>
                     <td>{{user[1]}}</td>
                 </tr>
                 {% endfor %}
