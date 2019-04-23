@@ -76,6 +76,12 @@ class UsersModel:
         row = cursor.fetchone()
         return row[0]
 
+    def delete(self, user_id):
+        cursor = self.connection.cursor()
+        cursor.execute('''DELETE FROM users WHERE id = ?''', (str(user_id),))
+        cursor.close()
+        self.connection.commit()
+
 UsersModel(db.get_connection()).init_table()
 
 
@@ -125,6 +131,12 @@ class NewsModel:
         cursor.close()
         self.connection.commit()
 
+    def delete_all(self, user_id):
+        cursor = self.connection.cursor()
+        cursor.execute('''DELETE FROM news WHERE user_id = ?''', (str(user_id),))
+        cursor.close()
+        self.connection.commit()
+
 
 NewsModel(db.get_connection()).init_table()
 
@@ -160,7 +172,6 @@ def index():
         return render_template('index.html', username=session['username'],
                            news=news, form=form)
     news = reversed(list(NewsModel(db.get_connection()).get_all(session['user_id'])))
-    print(news)
     return render_template('index.html', username=session['username'],
                            news=news, form=form)
 
@@ -206,9 +217,11 @@ def delete_news(news_id):
     if 'username' not in session:
         return redirect('/login')
     nm = NewsModel(db.get_connection())
-    print(nm.get(news_id))
+    user = nm.get(news_id)[4]
     if nm.get(news_id)[3] == session['user_id'] or session['username'] == 'admin':
         nm.delete(news_id)
+    if session['username'] == 'admin' and user != 'admin':
+        return redirect('/user/' + user)
     return redirect("/index")
 
 
@@ -236,8 +249,20 @@ def users():
     return render_template('/users.html', users=usersn)
 
 
+@app.route('/delete_user/<username>')
+def delete_user(username):
+    if session['username'] != 'admin':
+        return redirect('/index')
+    id = UsersModel(db.get_connection()).get_id(username)
+    UsersModel(db.get_connection()).delete(id)
+    NewsModel(db.get_connection()).delete_all(id)
+    return redirect('/users')
+
+
 @app.route('/user/<username>', methods=['GET', 'POST'])
 def user(username):
+    if session['username'] != 'admin':
+        return redirect('/index')
     userid = UsersModel(db.get_connection()).get_id(username)
     usernews = NewsModel(db.get_connection()).get_all(userid)
     return render_template('user.html', username=username, news=usernews)
