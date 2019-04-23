@@ -253,10 +253,11 @@ def users():
 def delete_user(username):
     if session['username'] != 'admin':
         return redirect('/index')
-    id = UsersModel(db.get_connection()).get_id(username)
-    UsersModel(db.get_connection()).delete(id)
-    NewsModel(db.get_connection()).delete_all(id)
-    return redirect('/users')
+    if username != 'admin':
+        id = UsersModel(db.get_connection()).get_id(username)
+        UsersModel(db.get_connection()).delete(id)
+        NewsModel(db.get_connection()).delete_all(id)
+        return redirect('/users')
 
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
