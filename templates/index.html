@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+    <h1>Привет, {{ username }}!</h1>
+        <div class="d-flex justify-content-between">
+            <a href="/add_news">Добавить новость</a>
+            <form action="" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <p>
+                    {{ form.sort.label }}
+                    {{ form.sort }}
+                    {% for subfield in form.poryadok %}
+                        <tr>
+                            <td>{{ subfield }}</td>
+                            <td>{{ subfield.label }}</td>
+                        </tr>
+                    {% endfor %}
+                    {{ form.submit() }}
+                </p>
+            </form>
+        </div>
+        {% for item in news %}
+            <div class="alert alert-dark" role="alert">
+                <h2>{{item[1]}}</h2>
+                <div>{{item[2]}}</div>
+                <div class="d-flex justify-content-between">
+                    <a href="/delete_news/{{item[0]}}">Удалить новость</a>
+                    <a>{{item[4]}}</a>
+                </div>
+            </div>
+        {% endfor %}
+{% endblock %}
